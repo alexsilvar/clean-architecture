@@ -1,4 +1,5 @@
-﻿using SharedKernel;
+﻿using Domain.Audits;
+using SharedKernel;
 
 namespace Domain.Users;
 
@@ -8,5 +9,6 @@ public sealed class User : Entity
     public string Email { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
+    [NoAudit]
     public string PasswordHash { get; set; }
 }

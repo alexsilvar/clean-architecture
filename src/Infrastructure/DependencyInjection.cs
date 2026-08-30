@@ -33,6 +33,8 @@ public static class DependencyInjection
     {
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
+        services.AddScoped<AuditInterceptor>();
+
         services.AddTransient<IDomainEventsDispatcher, DomainEventsDispatcher>();
 
 #pragma warning disable EXTEXP0018 // HybridCache is released; the API is stable in .NET 10.
@@ -47,10 +49,11 @@ public static class DependencyInjection
         string? connectionString = configuration.GetConnectionString("Database");
 
         services.AddDbContext<ApplicationDbContext>(
-            options => options
+            (serviceProvider, options) => options
                 .UseNpgsql(connectionString, npgsqlOptions =>
                     npgsqlOptions.MigrationsHistoryTable(HistoryRepository.DefaultTableName, Schemas.Default))
-                .UseSnakeCaseNamingConvention());
+                .UseSnakeCaseNamingConvention()
+                .AddInterceptors(serviceProvider.GetRequiredService<AuditInterceptor>()));
 
         services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
 
